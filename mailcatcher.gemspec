@@ -30,15 +30,16 @@ Gem::Specification.new do |s|
   s.executables = ["mailcatcher", "catchmail"]
   s.extra_rdoc_files = ["README.md", "LICENSE"]
 
-  s.required_ruby_version = ">= 2.6.0"
+  s.required_ruby_version = ">= 3.1"
 
-  s.add_dependency "eventmachine", "1.0.9.1"
+  s.add_dependency "eventmachine", "~> 1.0"
+  s.add_dependency "faye-websocket", "~> 0.11.1"
   s.add_dependency "mail", "~> 2.3"
-  s.add_dependency "rack", "~> 1.5"
-  s.add_dependency "sinatra", "~> 1.2"
+  s.add_dependency "net-smtp"
+  s.add_dependency "rack", "~> 2.2"
+  s.add_dependency "sinatra", "~> 3.2"
   s.add_dependency "sqlite3", "~> 1.3"
-  s.add_dependency "thin", "~> 1.5.0"
-  s.add_dependency "skinny", "~> 0.2.3"
+  s.add_dependency "thin", "~> 1.8"
 
   s.add_development_dependency "capybara"
   s.add_development_dependency "capybara-screenshot"

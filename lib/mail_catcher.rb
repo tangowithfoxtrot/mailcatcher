@@ -38,10 +38,10 @@ module MailCatcher extend self
   end
 
   def windows?
-    RbConfig::CONFIG["host_os"] =~ /mswin|mingw/
+    RbConfig::CONFIG["host_os"].match?(/mswin|mingw/)
   end
 
-  def browseable?
+  def browsable?
     windows? or which? "open"
   end
 
@@ -146,7 +146,7 @@ module MailCatcher extend self
           end
         end
 
-        if browseable?
+        if browsable?
           parser.on("-b", "--browse", "Open web browser") do
             options[:browse] = true
           end
@@ -204,13 +204,19 @@ module MailCatcher extend self
       end
 
       # Let Thin set itself up inside our EventMachine loop
-      # (Skinny/WebSockets just works on the inside)
+      # Faye connections are hijacked but continue to be supervised by thin
       rescue_port options[:http_port] do
-        Thin::Server.start(options[:http_ip], options[:http_port], Web)
+        Thin::Server.start(options[:http_ip], options[:http_port], Web, signals: false)
         puts "==> #{http_url}"
       end
 
-      # Open the web browser before detatching console
+      # Make sure we quit nicely when asked
+      # We need to handle outside the trap context, hence the timer
+      trap("INT") { EM.add_timer(0) { quit! } }
+      trap("TERM") { EM.add_timer(0) { quit! } }
+      trap("QUIT") { EM.add_timer(0) { quit! } } unless windows?
+
+      # Open the web browser before detaching console
       if options[:browse]
         EventMachine.next_tick do
           browse http_url
